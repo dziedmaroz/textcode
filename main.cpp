@@ -8,10 +8,28 @@
 int main ()
 {
   Config conf;
-  if (!readConfig("codethis.conf",conf)) return 100;
+  if (!readConfig("codethis.conf",conf))
+  {	
+	  printf ("Closing application...\n");
+	  free (conf.sInFilename);
+	  free (conf.sOutFilename);
+	  return 100;
+  }
   printf ("\n\n");
-  if (!checkConfig(conf)) return 200;
-
+  if (!checkConfig(conf))
+  {
+	  printf ("Closing application...\n");
+	  free (conf.sInFilename);
+	  free (conf.sOutFilename);
+	  return 200;
+  }
+  int nLines=0;
+  char** srcText = readtext(conf.sInFilename,nLines);
+  CCode tocode (srcText, conf.base, nLines);
+  tocode.codeText ();
+  char** destText;
+  tocode.getCryptedText(destText,nLines);
+  writeText(conf.sOutFilename,destText,nLines);
   free (conf.sInFilename);
   free (conf.sOutFilename);
   system ("PAUSE");
@@ -66,7 +84,10 @@ bool checkConfig (Config& conf)
     test  = fopen(conf.sOutFilename,"r");
     if (test)
     {
-        printf ("Warring: File for output (%s) already exists. It will be overwritten.\n",conf.sOutFilename);
+        printf ("Warring: File for output (%s) already exists. It will be overwritten.  Do you whant to continue? [Y/N]\n>",conf.sOutFilename);
+		char choise;
+        scanf("%c",&choise);
+        if (choise!='Y'|| choise !='y') return false;
     }
     fclose (test);
     if (!strcmp(conf.sInFilename,conf.sOutFilename))
@@ -74,7 +95,30 @@ bool checkConfig (Config& conf)
         printf ("Warring: Source('%s')  and destination('%s') are matching. All data in source file will be lost. Do you whant to continue? [Y/N]\n>",conf.sInFilename,conf.sOutFilename);
         char choise;
         scanf("%c",&choise);
-        if (choise!='Y'|| choise !='y') isOk=false;
+        if (choise!='Y'|| choise !='y') return false;
     }
     return isOk;
+}
+
+char** readtext (char* filename, int& nLines)
+{
+	char** text = new char* ;
+	FILE* fin = fopen (filename,"r");
+	nLines=0;
+	while (!feof(fin))
+	{
+		text[nLines]= new char [500];
+		fgets(text[nLines],500,fin);
+		text[nLines][strlen(text[nLines])]='\0';
+		nLines++;
+	}
+	fclose(fin);
+	return text;
+}
+void writeText (char* filename,char** text, int nLines)
+{
+	FILE* fout = fopen (filename,"w");
+	for (int i=0;i<nLines;i++)
+		printf ("%s\n", text[i]);
+	fclose(fout);
 }
