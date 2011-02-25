@@ -7,23 +7,23 @@ CCode::CCode ()
 	maxLen_=0;
 	chLen_=0;
 	cLines_=0;
-	opentext_=0;
-	cryptedtext_=0;
+        opentext_=NULL;
+        cryptedtext_=NULL;
 }
 
 CCode::CCode (char** source, int base, int linescount)
 {
-	opentext_=source;
+        copyText (opentext_,source,linescount);
 	cdBase_=base;
 	cLines_=linescount;
 	maxLen_=0;
 	for (int i=0;i<cLines_;i++)
 		if (maxLen_<strlen (opentext_[i])) maxLen_=strlen(opentext_[i]);
-    chLen_=getChLen(cdBase_);          //get max char len
-	cryptedtext_=(char**) malloc (sizeof(char*)*cLines_);
+        chLen_=getChLen(cdBase_);          //get max char len
+        cryptedtext_=new char* [cLines_];
 	for (int i=0;i<cLines_;i++)
 	{
-		cryptedtext_[i]=(char*) malloc (sizeof(char)*(maxLen_*chLen_+1));
+                cryptedtext_[i]=new char [maxLen_*chLen_];
 		for (int j=0;j<maxLen_;j++) cryptedtext_[i][j]='0'; // fillin' strings with '0'
 		cryptedtext_[i][maxLen_]='\0'; 
 	}
@@ -50,13 +50,13 @@ int CCode::getChLen (int base)
 void CCode::freeMyText (char** text)
 {
 	for (int i=0;i<cLines_;i++)
-		free (text[i]);
-	free (text);
+                delete (text[i]);
+        delete (text);
 }
 
 char* CCode::convertCh (char ch)
 {
-	char* res = (char*) malloc (sizeof(char)*chLen_);
+        char* res = new char [chLen_];
 	for (int i=0;i<chLen_;i++)
 		res[i]='0';
     int i=0;
@@ -95,7 +95,7 @@ void CCode::writeCh (char source, char* dest, int pos)
 {
     char* srcCh = convertCh(source);
 	for (int i=0; i<chLen_;i++) dest[pos+i]=srcCh[i];
-	free (srcCh);
+        delete (srcCh);
 }
 
 
@@ -113,9 +113,12 @@ void CCode::getCryptedText(char ** text, int & nLines)
 
 void CCode::copyText (char** source, char** dest, int nLines)
 {
-	for (int i=0;i<nLines;i++)
+    dest = new char* [nLines];
+    for (int i=0;i<nLines;i++)
 	{
+                dest[i]= new char [strlen(source[i])];
 		for (int j=0; j<strlen(source[i]);j++)
-			source[i][j]=dest[i][j];			
+                        source[i][j]=dest[i][j];
+                dest[strlen(source[i])]='\0';
 	}
 }

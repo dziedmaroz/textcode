@@ -11,18 +11,18 @@ int main ()
   if (!readConfig("codethis.conf",conf))
   {	
 	  printf ("Closing application...\n");
-	  free (conf.sInFilename);
-	  free (conf.sOutFilename);
+          delete (conf.sInFilename);
+          delete (conf.sOutFilename);
 	  return 100;
   }
   printf ("\n\n");
-  if (!checkConfig(conf))
-  {
-	  printf ("Closing application...\n");
-	  free (conf.sInFilename);
-	  free (conf.sOutFilename);
-	  return 200;
-  }
+//  if (!checkConfig(conf))
+//  {
+//	  printf ("Closing application...\n");
+//	  delete (conf.sInFilename);
+//	  delete (conf.sOutFilename);
+//	  return 200;
+//  }
   int nLines=0;
   char** srcText = readtext(conf.sInFilename,nLines);
   CCode tocode (srcText, conf.base, nLines);
@@ -30,8 +30,8 @@ int main ()
   char** destText;
   tocode.getCryptedText(destText,nLines);
   writeText(conf.sOutFilename,destText,nLines);
-  free (conf.sInFilename);
-  free (conf.sOutFilename);
+  delete (conf.sInFilename);
+  delete (conf.sOutFilename);
   system ("PAUSE");
   return 0;
 }
@@ -39,8 +39,8 @@ int main ()
 bool readConfig (char* confFileName, Config& conf)
 {
     FILE* fConf = fopen (confFileName, "r");
-    conf.sInFilename   = (char*) malloc (sizeof(char)*200);
-    conf.sOutFilename  = (char*) malloc (sizeof(char)*200);
+    conf.sInFilename   = new char [200];
+    conf.sOutFilename  = new char [200];
     if (!fConf)
     {
         printf ("Error:Can't find configuration file ('%s').\n",confFileName);
@@ -109,7 +109,7 @@ char** readtext (char* filename, int& nLines)
 	{
 		text[nLines]= new char [500];
 		fgets(text[nLines],500,fin);
-		text[nLines][strlen(text[nLines])]='\0';
+                text[nLines][strlen(text[nLines])-1]='\0';
 		nLines++;
 	}
 	fclose(fin);
