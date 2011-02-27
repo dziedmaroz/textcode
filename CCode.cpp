@@ -7,25 +7,25 @@ CCode::CCode ()
 	maxLen_=0;
 	chLen_=0;
 	cLines_=0;
-        opentext_=NULL;
-        cryptedtext_=NULL;
+    opentext_=NULL;
+    cryptedtext_=NULL;
 }
 
 CCode::CCode (char** source, int base, int linescount)
 {
-        copyText (opentext_,source,linescount);
+    copyText (source,opentext_,linescount);
 	cdBase_=base;
 	cLines_=linescount;
 	maxLen_=0;
 	for (int i=0;i<cLines_;i++)
 		if (maxLen_<strlen (opentext_[i])) maxLen_=strlen(opentext_[i]);
-        chLen_=getChLen(cdBase_);          //get max char len
-        cryptedtext_=new char* [cLines_];
+    chLen_=getChLen(cdBase_);          //get max char len
+    cryptedtext_=new char* [cLines_];
 	for (int i=0;i<cLines_;i++)
 	{
                 cryptedtext_[i]=new char [maxLen_*chLen_];
-		for (int j=0;j<maxLen_;j++) cryptedtext_[i][j]='0'; // fillin' strings with '0'
-		cryptedtext_[i][maxLen_]='\0'; 
+		for (int j=0;j<maxLen_*chLen_;j++) cryptedtext_[i][j]='0'; // fillin' strings with '0'
+		cryptedtext_[i][maxLen_*chLen_]='\0'; 
 	}
 }
 
@@ -64,8 +64,10 @@ char* CCode::convertCh (char ch)
 	while  (ch!=0)
 	{
 		mod=ch%cdBase_;
+		ch/=cdBase_;		
 		if (mod<10) res[i]='0'+mod;
 		else res[i]='A'+(mod-10);
+		i++;
 	}
 	res=revCodedCh(res);
     return res;
@@ -76,16 +78,19 @@ char* CCode::revCodedCh (char* ch)
 	for (int i=0;i<chLen_/2;i++)
 	{
 		char tmp=ch[i];
-		ch[i]=ch[chLen_-i];
-		ch[chLen_-i]=tmp;
+		ch[i]=ch[chLen_-i-1];
+		ch[chLen_-i-1]=tmp;
 	}
 	return ch;
 }
 
 void CCode::codeText() 
 {
+	
 	for (int i=0; i<cLines_; i++ )
 	{
+		int sLen = strlen (opentext_[i]);
+
 		for (int j=0; j<strlen(opentext_[i]);j++)
 			writeCh (opentext_[i][j],cryptedtext_[i],j*chLen_);		
 	}
@@ -105,20 +110,22 @@ void CCode::setOpenText (char** text, int base,int nLines)
 	*this = CCode (text,base, nLines);
 }
 
-void CCode::getCryptedText(char ** text, int & nLines)
+void CCode::getCryptedText(char ** &text, int & nLines)
 {
 	copyText(cryptedtext_,text,cLines_);
 	nLines=cLines_;
 }
 
-void CCode::copyText (char** source, char** dest, int nLines)
+void CCode::copyText (char** source, char** &dest, int nLines)
 {
+  //copyText (opentext_,source,linescount);
     dest = new char* [nLines];
     for (int i=0;i<nLines;i++)
 	{
-                dest[i]= new char [strlen(source[i])];
+		int sLen= strlen (source[i]);
+        dest[i]= new char [strlen(source[i])+1];
 		for (int j=0; j<strlen(source[i]);j++)
-                        source[i][j]=dest[i][j];
-                dest[strlen(source[i])]='\0';
+			dest[i][j]= source [i][j];
+        dest[i][sLen]='\0';
 	}
 }

@@ -27,11 +27,19 @@ int main ()
   char** srcText = readtext(conf.sInFilename,nLines);
   CCode tocode (srcText, conf.base, nLines);
   tocode.codeText ();
-  char** destText;
+  char** destText=NULL;
   tocode.getCryptedText(destText,nLines);
   writeText(conf.sOutFilename,destText,nLines);
   delete (conf.sInFilename);
   delete (conf.sOutFilename);
+  for (int i=0;i<nLines;i++)
+  {
+  	delete srcText[i];
+	delete destText[i];
+  }
+
+  delete srcText;
+  delete destText;
   system ("PAUSE");
   return 0;
 }
@@ -109,8 +117,11 @@ char** readtext (char* filename, int& nLines)
 	{
 		text[nLines]= new char [500];
 		fgets(text[nLines],500,fin);
-                text[nLines][strlen(text[nLines])-1]='\0';
-		nLines++;
+		if (strlen(text[nLines])!=0) 
+		{
+			text[nLines][strlen(text[nLines])]='\0';
+			nLines++;
+		}
 	}
 	fclose(fin);
 	return text;
@@ -119,6 +130,6 @@ void writeText (char* filename,char** text, int nLines)
 {
 	FILE* fout = fopen (filename,"w");
 	for (int i=0;i<nLines;i++)
-		printf ("%s\n", text[i]);
+		fprintf (fout,"%s\n", text[i]);
 	fclose(fout);
 }

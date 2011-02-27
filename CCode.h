@@ -13,12 +13,12 @@ class CCode
 	void writeCh (char, char*, int);
 	void freeMyText (char**);
 	char* revCodedCh (char*);
-	void copyText (char**, char**, int);
+	void copyText (char**, char** &, int);
 public:
 	CCode(void);
 	CCode (char**, int, int);
 	void setOpenText (char**, int, int);
-	void getCryptedText (char** ,int&);
+	void getCryptedText (char**& ,int&);
     void codeText (void);	
 	~CCode(void);
 };
