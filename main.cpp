@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <cstdlib>
 #include <cstring>
-#include "CCode.h"
+#include "structdef.h"
+#include "code.h"
 
 #include "main.h"
 
@@ -23,23 +24,13 @@ int main ()
 //	  delete (conf.sOutFilename);
 //	  return 200;
 //  }
-  int nLines=0;
-  char** srcText = readtext(conf.sInFilename,nLines);
-  CCode tocode (srcText, conf.base, nLines);
-  tocode.codeText ();
-  char** destText=NULL;
-  tocode.getCryptedText(destText,nLines);
-  writeText(conf.sOutFilename,destText,nLines);
+
+  Code tocode (conf);
+  tocode.code();
+  tocode.writeText();
   delete (conf.sInFilename);
   delete (conf.sOutFilename);
-  for (int i=0;i<nLines;i++)
-  {
-  	delete srcText[i];
-	delete destText[i];
-  }
 
-  delete srcText;
-  delete destText;
   system ("PAUSE");
   return 0;
 }

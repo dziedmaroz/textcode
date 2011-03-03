@@ -16,13 +16,16 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp \
-    CCode.cpp
+    crypt.cpp \
+    code.cpp
 
 HEADERS += \
-    CCode.h \
-    main.h
+    main.h \
+    crypt.h \
+    code.h \
+    structdef.h
 
 OTHER_FILES += \
-    opentext.txt \
-    cryptedtext.txt \
-    codethis.conf
+    codethis.conf \
+    open.txt \
+    ../codethiscodethat-build-desktop/crypted.txt
