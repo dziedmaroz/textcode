@@ -67,5 +67,6 @@ void Code::code()
     {
         for (int j=0; j<strlen(srcText_[i]);j++)
                 writeCh (srcText_[i][j],destText_[i],j*chLen_);
+       // destText_[i][chLen_*strlen(srcText_[i])]='\0';
     }
 }

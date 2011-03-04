@@ -17,13 +17,15 @@ TEMPLATE = app
 
 SOURCES += main.cpp \
     crypt.cpp \
-    code.cpp
+    code.cpp \
+    decode.cpp
 
 HEADERS += \
     main.h \
     crypt.h \
     code.h \
-    structdef.h
+    structdef.h \
+    decode.h
 
 OTHER_FILES += \
     codethis.conf \

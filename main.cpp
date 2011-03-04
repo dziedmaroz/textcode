@@ -3,7 +3,7 @@
 #include <cstring>
 #include "structdef.h"
 #include "code.h"
-
+#include "decode.h"
 #include "main.h"
 
 int main ()
@@ -25,9 +25,18 @@ int main ()
 //	  return 200;
 //  }
 
-  Code tocode (conf);
-  tocode.code();
-  tocode.writeText();
+  if (conf.mode=='c')
+  {
+    Code tocode (conf);
+    tocode.code();
+    tocode.writeText();
+  }
+  else
+  {
+    Decode todecode (conf);
+    todecode.decode();
+    todecode.writeText();
+  }
   delete (conf.sInFilename);
   delete (conf.sOutFilename);
 
