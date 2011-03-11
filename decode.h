@@ -9,10 +9,12 @@ class Decode : public Crypt
   //  void writeCh (char ch, char* destLine, int pos);
     void upcase ();
     bool emptyBlock (char* line, int pos);
+    void validate ();
 public:
     Decode();
     Decode (Config& conf);
     void decode ();
+
 };
 
 #endif // DECODE_H

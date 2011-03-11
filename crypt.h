@@ -4,15 +4,15 @@
 class Crypt
 {
 protected:
-    char** srcText_;
-    char** destText_;
-    int cLines_;
+    char* srcText_;
+    char* destText_;
+    int srcLen_;
     char* pathIn_;
     char* pathOut_;
     int chLen_;
     int cdBase_;
+    int destLen_;
     int sMaxLen_;
-
     void readText ();
     int getChLen ();
 public:

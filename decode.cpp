@@ -4,7 +4,7 @@ Decode::Decode()
 {
     this->cdBase_=0;
     this->chLen_=0;
-    this->cLines_=0;
+    this->srcLen_=0;
     this->srcText_=0;
     this->sMaxLen_=0;
     this->pathIn_=0;
@@ -20,14 +20,14 @@ Decode::Decode (Config &conf)
     this->pathIn_=conf.sInFilename;
     this->pathOut_=conf.sOutFilename;
     readText();
-    //this->sMaxLen_=conf.sLen;
-    destText_= new char* [cLines_];
+    validate ();
+    this->sMaxLen_=conf.sLen;
+
+    this->destLen_=srcLen_/chLen_+1;
+    destText_= new char [destLen_];
     upcase();
-    for (int i=0;i<cLines_;i++)
-    {
-        destText_ [i]= new char [sMaxLen_/chLen_+1];
-        destText_ [i][sMaxLen_/chLen_]='\0';
-    }
+    for (int i=0;i<destLen_;i++)    destText_ [i]= '0';
+    destText_[destLen_]='\0';
 }
 
 int Decode::intpow(int x, int y)
@@ -41,11 +41,10 @@ int Decode::intpow(int x, int y)
 
 void Decode::upcase()
 {
-    for (int i=0;i<cLines_;i++)
+    for (int i=0;i<srcLen_;i++)
     {
-        for (int j=0;j<strlen(srcText_[i]);j++)
-            if (srcText_[i][j]>='a' && srcText_[i][j]<='z')
-                srcText_[i][j]='A'+(srcText_[i][j]-'a');
+        if (srcText_[i]>='a' && srcText_[i]<='z')
+                srcText_[i]='A'+(srcText_[i]-'a');
     }
 }
 
@@ -68,19 +67,16 @@ char Decode::convertCh(char * ch, int pos)
 void Decode::decode()
 {
 
-    for (int i=0;i<cLines_;i++)
-    {
-        if (strlen(srcText_[i])==0) destText_[i][0]=0;
-        for (int j=0;j<strlen(srcText_[i]);j+=chLen_)
-        {
-            if (emptyBlock(srcText_[i],j))
-            {
-                destText_[i][j/chLen_]='\0';
-                break;
-            }
-            else destText_[i][j/chLen_]=convertCh(srcText_[i],j);
-        }
-    }
+
+   for (int i=0;i<this->destLen_;i++)
+   {
+       if (convertCh (srcText_,i*chLen_)==2)
+       {
+           destText_[i]='\0';
+           break;
+       }
+       destText_[i]=convertCh (srcText_,i*chLen_);
+   }
 }
 
 bool Decode::emptyBlock(char *line, int pos)
@@ -90,4 +86,20 @@ bool Decode::emptyBlock(char *line, int pos)
     if (i!=chLen_) return false;
     return true;
 
+}
+
+
+void Decode::validate ()
+{
+    int cnt =0;
+    for (int i=0;i<strlen(srcText_);i++)
+    {
+        if (srcText_[i]=='\n')
+        {
+            for (int j=i;j<strlen (srcText_)-1;j++)
+                srcText_[j]=srcText_[j+1];
+            cnt++;
+        }
+    }
+    srcLen_-=cnt;
 }

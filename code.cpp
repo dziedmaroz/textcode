@@ -1,6 +1,6 @@
 #include "code.h"
 #include <cstring>
-
+#include <stdio.h>
 Code::Code(Config &conf)
 {
     this->cdBase_ = conf.base;
@@ -8,18 +8,12 @@ Code::Code(Config &conf)
     this->pathIn_=conf.sInFilename;
     this->pathOut_=conf.sOutFilename;
     this->readText();
-    //this->sMaxLen_=conf.sLen;
-    destText_ = new char* [cLines_];
+    this->sMaxLen_=conf.sLen;
+    this->destLen_ = srcLen_*chLen_+sMaxLen_-(srcLen_*chLen_)%sMaxLen_+1;
 
-    for (int i=0;i<cLines_;i++)
-    {
-        int tmp=chLen_*sMaxLen_;
-        tmp++;
-        destText_[i]=new char [tmp];
-        for (int j=0;j<tmp;j++)
-            destText_[i][j]='0';
-        destText_[i][tmp-1]='\0';
-    }
+    destText_ = new char [destLen_];
+    for (int i=0;i<destLen_;i++)  destText_[i]='0';
+    destText_[destLen_]='\0';
 
 }
 
@@ -63,10 +57,18 @@ void Code::writeCh (char  source,char* destLine,  int pos)
 
 void Code::code()
 {
-    for (int i=0; i<cLines_; i++ )
+     for (int i=0;i<srcLen_;i++)
+           writeCh (srcText_[i],destText_,i*chLen_);
+     writeCh ((char)2,destText_,srcLen_*chLen_);
+}
+
+void Code::writeText ()
+{
+    FILE* fout = fopen(this->pathOut_,"w");
+    for (int i=0;i<destLen_;i++)
     {
-        for (int j=0; j<strlen(srcText_[i]);j++)
-                writeCh (srcText_[i][j],destText_[i],j*chLen_);
-       // destText_[i][chLen_*strlen(srcText_[i])]='\0';
+        if (i%sMaxLen_==0 && i!=0) fprintf(fout,"\n");
+        fprintf (fout,"%c",destText_[i]);
     }
+    fclose(fout);
 }

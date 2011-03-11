@@ -10,7 +10,7 @@ class Code : public Crypt
     char* revCodedCh (char*);
 public:
     Code(Config &conf);
-
+    void writeText ();
     void code();
 
 };
